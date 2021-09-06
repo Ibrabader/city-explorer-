@@ -5,27 +5,49 @@ import { Form } from "react-bootstrap";
 import Button from 'react-bootstrap/Button';
 class App extends React.Component {
 
+
   constructor(props) {
     super(props);
     this.state = {
       locationInput: '',
       dataArray: {},
+      showLocation : false ,
+      WeatherDateAndDescription: [],
     }
   }
   handleChangeOfLocation = (event) => {
     this.setState({ locationInput: event.target.value })
-    console.log(this.state.locationInput);
+    //console.log(this.state.locationInput);
 
   };
+
+
   handleSubmit = async (e) => {
+
+    try{
      e.preventDefault();
-     console.log(this.state.locationInput);
+    //  console.log(this.state.locationInput);
     const url = `https://eu1.locationiq.com/v1/search.php?key=${process.env.REACT_APP_LOCATIONKEY}&q=${this.state.locationInput}&format=json`;
-    console.log(url);
+    const image = 'GET https://maps.locationiq.com/v3/staticmap';
+    // console.log(url);
     const response = await axios.get(url);
-      this.setState ({
-      dataArray: response.data[0],
-    });
+ 
+    const url2 = `http://localhost:3003/weather?city_name=${this.state.locationInput}`
+    const res = await axios.get(url2);
+    console.log('url of API '+url2);
+    this.setState ({
+    showLocation : true,
+    dataArray: response.data[0],
+    WeatherDateAndDescription : res.data[0],
+    
+  });
+  console.log(this.state.WeatherDateAndDescription.date); 
+  console.log(this.state.WeatherDateAndDescription.description); 
+  }
+    catch {
+     console.log('error');
+
+    }
   };
 
 
@@ -48,13 +70,18 @@ class App extends React.Component {
             Explore !
           </Button>
         </Form>
-       
-          <h1> City Name : {this.state.dataArray.display_name}</h1>
+        
+       {this.state.showLocation && <div><h1> City Name : {this.state.dataArray.display_name}</h1>
           <h1> lat : {this.state.dataArray.lat}</h1>
           <h1> lon : {this.state.dataArray.lon}</h1>
         
-          {/* <img src='https://maps.locationiq.com/v3/staticmap?key=<YOUR_ACCESS_TOKEN>&center=<latitude>,<longitude>&zoom=<zoom>&size=<width>x<height>&format=<format>&maptype=<MapType>&markers=icon:<icon>|<latitude>,<longitude>&markers=icon:<icon>|<latitude>,<longitude>'> */}
+          <img src={`https://maps.locationiq.com/v3/staticmap?key=${process.env.REACT_APP_LOCATIONKEY}&center=${this.state.dataArray.lat},${this.state.dataArray.lon}&zoom=<zoom>&size=300x300`} /></div> }
+          <div>
+          <p>{this.state.WeatherDateAndDescription.date}</p>
+          <p>{this.state.WeatherDateAndDescription.description}</p>
+          </div>
       </div>
+
     );
 
   }
