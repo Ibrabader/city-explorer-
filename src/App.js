@@ -12,11 +12,18 @@ class App extends React.Component {
       locationInput: '',
       dataArray: {},
       showLocation : false ,
-      WeatherDateAndDescription: [],
+      WeatherDateAndDescription: {},
+      longtitude : '',
+      latitude : '',
     }
   }
+  
   handleChangeOfLocation = (event) => {
-    this.setState({ locationInput: event.target.value })
+    this.setState({ 
+      locationInput: event.target.value,
+      
+    
+    })
     //console.log(this.state.locationInput);
 
   };
@@ -29,20 +36,26 @@ class App extends React.Component {
     //  console.log(this.state.locationInput);
     const url = `https://eu1.locationiq.com/v1/search.php?key=${process.env.REACT_APP_LOCATIONKEY}&q=${this.state.locationInput}&format=json`;
     const image = 'GET https://maps.locationiq.com/v3/staticmap';
+    const url2 = `http://localhost:3004/weather?lat=${this.state.latitude}&lon=${this.state.longtitude}`
+
     // console.log(url);
     const response = await axios.get(url);
- 
-    const url2 = `http://localhost:3003/weather?city_name=${this.state.locationInput}`
-    const res = await axios.get(url2);
+    const res =  await axios.get(url2);
     console.log('url of API '+url2);
-    this.setState ({
+    console.log(this.state.latitude);
+
+     this.setState ({
     showLocation : true,
     dataArray: response.data[0],
-    WeatherDateAndDescription : res.data[0],
+    WeatherDateAndDescription : res,
+    longtitude : response.data[0].lon,
+    latitude : response.data[0].lat,
     
   });
-  console.log(this.state.WeatherDateAndDescription.date); 
-  console.log(this.state.WeatherDateAndDescription.description); 
+  console.log(this.state.latitude);
+  console.log(this.state.WeatherDateAndDescription.data[0].datetime); 
+  // console.log(this.state.WeatherDateAndDescription.data.description); 
+  
   }
     catch {
      console.log('error');
@@ -79,6 +92,8 @@ class App extends React.Component {
           <div>
           <p>{this.state.WeatherDateAndDescription.date}</p>
           <p>{this.state.WeatherDateAndDescription.description}</p>
+          {/* <p>{this.state.WeatherDateAndDescription.description}</p> */}
+          
           </div>
       </div>
 
