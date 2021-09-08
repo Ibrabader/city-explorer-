@@ -3,6 +3,7 @@ import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { Form } from "react-bootstrap";
 import Button from 'react-bootstrap/Button';
+import { Card } from "react-bootstrap";
 class App extends React.Component {
 
 
@@ -12,64 +13,52 @@ class App extends React.Component {
       locationInput: '',
       dataArray: {},
       showLocation : false ,
-      WeatherDateAndDescription: {},
-      longtitude : '',
-      latitude : '',
+      WeatherDateAndDescription: [],
+      moviesDetail : [],
     }
   }
   
   handleChangeOfLocation = (event) => {
     this.setState({ 
       locationInput: event.target.value,
-      
-    
+
     })
-    //console.log(this.state.locationInput);
 
   };
 
 
   handleSubmit = async (e) => {
 
-    try{
-     e.preventDefault();
-    //  console.log(this.state.locationInput);
+    try{ e.preventDefault();
+
     const url = `https://eu1.locationiq.com/v1/search.php?key=${process.env.REACT_APP_LOCATIONKEY}&q=${this.state.locationInput}&format=json`;
-    const image = 'GET https://maps.locationiq.com/v3/staticmap';
-    const url2 = `http://localhost:3004/weather?lat=${this.state.latitude}&lon=${this.state.longtitude}`
-
-    // console.log(url);
     const response = await axios.get(url);
-    const res =  await axios.get(url2);
-    console.log('url of API '+url2);
-    console.log(this.state.latitude);
-
      this.setState ({
     showLocation : true,
     dataArray: response.data[0],
-    WeatherDateAndDescription : res,
-    longtitude : response.data[0].lon,
-    latitude : response.data[0].lat,
-    
   });
-  console.log(this.state.latitude);
-  console.log(this.state.WeatherDateAndDescription.data[0].datetime); 
-  // console.log(this.state.WeatherDateAndDescription.data.description); 
-  
-  }
+
+  const url2 = `http://localhost:3004/weather?lat=${this.state.dataArray.lat}&lon=${this.state.dataArray.lon}`;
+  const res =  await axios.get(url2);
+  const url3 = `http://localhost:3004/movies?query=${this.state.locationInput}`;
+  const responseMovies = await axios.get(url3);
+  this.setState ({
+    WeatherDateAndDescription : res.data,
+    moviesDetail : responseMovies.data, 
+  })
+  console.log(this.state.WeatherDateAndDescription);  
+  console.log(this.state.moviesDetail);
+}
     catch {
      console.log('error');
 
     }
   };
-
-
-
-
+  
   render() {
 
-
-    return (
+  return (
+      
       <div>
         <Form onSubmit={this.handleSubmit}  >
           <Form.Group className="mb-3" controlId="formBasicEmail">
@@ -85,24 +74,51 @@ class App extends React.Component {
         </Form>
         
        {this.state.showLocation && <div><h1> City Name : {this.state.dataArray.display_name}</h1>
-          <h1> lat : {this.state.dataArray.lat}</h1>
-          <h1> lon : {this.state.dataArray.lon}</h1>
-        
-          <img src={`https://maps.locationiq.com/v3/staticmap?key=${process.env.REACT_APP_LOCATIONKEY}&center=${this.state.dataArray.lat},${this.state.dataArray.lon}&zoom=<zoom>&size=300x300`} /></div> }
-          <div>
-          <p>{this.state.WeatherDateAndDescription.date}</p>
-          <p>{this.state.WeatherDateAndDescription.description}</p>
-          {/* <p>{this.state.WeatherDateAndDescription.description}</p> */}
           
+          <img src={`https://maps.locationiq.com/v3/staticmap?key=${process.env.REACT_APP_LOCATIONKEY}&center=${this.state.dataArray.lat},${this.state.dataArray.lon}&zoom=<zoom>&size=500x500`} /></div> }
+          <div>
+          { this.state.WeatherDateAndDescription.map(item => {
+           return (
+            <> 
+            <p>{item.datetime}</p>
+          <p>{item.description}</p>
+          </>)
+          })}
+
+          
+          { this.state.moviesDetail.map(item => {
+            return (
+             <Card style={{ width: '18rem' }}>
+             <Card.Img variant="top" src={`https://image.tmdb.org/t/p/w500/${item.poster_path}`} alt='' />
+             <Card.Body>
+               <Card.Title>{item.title}</Card.Title>
+               <Card.Text>
+               overview: {item.overview}
+               </Card.Text>
+               <Card.Text>
+               vote_average: {item.vote_average}
+               </Card.Text>
+                 <Card.Text>
+                 vote_count: {item.vote_count}
+               </Card.Text> 
+               <Card.Text>
+               popularity: {item.popularity} 
+               </Card.Text>
+               <Card.Text>
+               release_date: {item.release_date} 
+               </Card.Text>
+             </Card.Body>
+           </Card>
+           )
+
+
+          })}
           </div>
       </div>
 
     );
 
   }
-
-
-
 
 };
 
