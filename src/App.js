@@ -5,8 +5,6 @@ import { Form } from "react-bootstrap";
 import Button from 'react-bootstrap/Button';
 import { Card } from "react-bootstrap";
 class App extends React.Component {
-
-
   constructor(props) {
     super(props);
     this.state = {
@@ -17,27 +15,19 @@ class App extends React.Component {
       moviesDetail : [],
     }
   }
-  
   handleChangeOfLocation = (event) => {
     this.setState({ 
       locationInput: event.target.value,
-
     })
-
   };
-
-
   handleSubmit = async (e) => {
-
     try{ e.preventDefault();
-
     const url = `https://eu1.locationiq.com/v1/search.php?key=${process.env.REACT_APP_LOCATIONKEY}&q=${this.state.locationInput}&format=json`;
     const response = await axios.get(url);
      this.setState ({
     showLocation : true,
     dataArray: response.data[0],
   });
-
   const url2 = `http://localhost:3004/weather?lat=${this.state.dataArray.lat}&lon=${this.state.dataArray.lon}`;
   const res =  await axios.get(url2);
   const url3 = `http://localhost:3004/movies?query=${this.state.locationInput}`;
@@ -46,19 +36,13 @@ class App extends React.Component {
     WeatherDateAndDescription : res.data,
     moviesDetail : responseMovies.data, 
   })
-  console.log(this.state.WeatherDateAndDescription);  
-  console.log(this.state.moviesDetail);
-}
+  }
     catch {
      console.log('error');
-
     }
   };
-  
   render() {
-
   return (
-      
       <div>
         <Form onSubmit={this.handleSubmit}  >
           <Form.Group className="mb-3" controlId="formBasicEmail">
@@ -72,9 +56,7 @@ class App extends React.Component {
             Explore !
           </Button>
         </Form>
-        
        {this.state.showLocation && <div><h1> City Name : {this.state.dataArray.display_name}</h1>
-          
           <img src={`https://maps.locationiq.com/v3/staticmap?key=${process.env.REACT_APP_LOCATIONKEY}&center=${this.state.dataArray.lat},${this.state.dataArray.lon}&zoom=<zoom>&size=500x500`} /></div> }
           <div>
           { this.state.WeatherDateAndDescription.map(item => {
@@ -84,8 +66,6 @@ class App extends React.Component {
           <p>{item.description}</p>
           </>)
           })}
-
-          
           { this.state.moviesDetail.map(item => {
             return (
              <Card style={{ width: '18rem' }}>
@@ -109,17 +89,11 @@ class App extends React.Component {
                </Card.Text>
              </Card.Body>
            </Card>
-           )
-
-
+            )
           })}
-          </div>
       </div>
-
+      </div>
     );
-
   }
-
 };
-
 export default App;
