@@ -28,9 +28,9 @@ class App extends React.Component {
     showLocation : true,
     dataArray: response.data[0],
   });
-  const url2 = `http://localhost:3004/weather?lat=${this.state.dataArray.lat}&lon=${this.state.dataArray.lon}`;
+  const url2 = `${process.env.REACT_APP_LOCALHOST}/weather?lat=${this.state.dataArray.lat}&lon=${this.state.dataArray.lon}`;
   const res =  await axios.get(url2);
-  const url3 = `http://localhost:3004/movies?query=${this.state.locationInput}`;
+  const url3 = `${process.env.REACT_APP_LOCALHOST}/movies?query=${this.state.locationInput}`;
   const responseMovies = await axios.get(url3);
   this.setState ({
     WeatherDateAndDescription : res.data,
